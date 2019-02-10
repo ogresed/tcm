@@ -29,7 +29,7 @@ public class Parser {
         return tmp;
     }
 
-    private int parseTerm() throws Exception {
+    public int parseTerm() throws Exception {
         int tmp = parseFactor();
         //current = lexer.getLexeme();
         while("*".equals(current.getLex()) || "/".equals(current.getLex())) {
@@ -46,7 +46,7 @@ public class Parser {
         return tmp;
     }
 
-    private int parseFactor() throws Exception {
+    public int parseFactor() throws Exception {
         /*int tmp = Integer.parseInt(current.getLex());
         current = lexer.getLexeme();
         return tmp;*/
@@ -59,7 +59,7 @@ public class Parser {
         return temp;
     }
 
-    private int parsePower() throws Exception {
+    public int parsePower() throws Exception {
         int sign = 1;
         if ("-".equals(current.getLex())) {
             sign = -1;
@@ -68,7 +68,7 @@ public class Parser {
         return sign*parseAtom();
     }
 
-    private int parseAtom() throws Exception {
+    public int parseAtom() throws Exception {
         int temp = 0;
         if (current.getType() == LexemeType.Number) {
             temp = Integer.valueOf(current.getLex());
