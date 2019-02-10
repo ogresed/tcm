@@ -1,6 +1,5 @@
 package parser;
 
-import lexer.LexemeType.*;
 import lexer.*;
 import java.io.Reader;
 
@@ -19,37 +18,69 @@ public class Parser {
     }
 
     public int parseExpression() throws Exception {
-        int sign = 1;
-        int temp = 0;
-        LexemeType type = current.getType();
-        switch (type) {
-            case Bracket: {
-                if("(".equals(current.getLex())) {
-                    current = lexer.getLexeme();
-                    temp+=sign*parseExpression();
-                }
-                else
-                    return temp;
-                break;
-            }
-            case Operation:{
-                if("+".equals(current.getLex())) {
-                    current = lexer.getLexeme();
-                    sign = 1;
-                }
-                if("-".equals(current.getLex())) {
-                    current = lexer.getLexeme();
-                    sign = -1;
-                }
-            }
-            case Number: {
-                temp = Integer.parseInt(current.getLex());
+        int tmp = parseTerm();
+        //current = lexer.getLexeme();
+        int sign;
+        while("+".equals(current.getLex()) || "-".equals(current.getLex())) {
+            sign = "+".equals(current.getLex()) ? 1 : -1;
+            current = lexer.getLexeme();
+            tmp+= sign * parseTerm();
+        }
+        return tmp;
+    }
+
+    private int parseTerm() throws Exception {
+        int tmp = parseFactor();
+        //current = lexer.getLexeme();
+        while("*".equals(current.getLex()) || "/".equals(current.getLex())) {
+            if("*".equals(current.getLex())) {
                 current = lexer.getLexeme();
-                break;
+                tmp*=parseFactor();
             }
-            case EOF: {
-                return temp;
+            else {
+                current = lexer.getLexeme();
+                tmp/=parseFactor();
             }
+            //current = lexer.getLexeme();
+        }
+        return tmp;
+    }
+
+    private int parseFactor() throws Exception {
+        /*int tmp = Integer.parseInt(current.getLex());
+        current = lexer.getLexeme();
+        return tmp;*/
+
+        int temp = parsePower();
+        if ("^".equals(current.getLex())) {
+            current = lexer.getLexeme();
+            return (int)Math.pow(temp, parseFactor());
+        }
+        return temp;
+    }
+
+    private int parsePower() throws Exception {
+        int sign = 1;
+        if ("-".equals(current.getLex())) {
+            sign = -1;
+            current = lexer.getLexeme();
+        }
+        return sign*parseAtom();
+    }
+
+    private int parseAtom() throws Exception {
+        int temp = 0;
+        if (current.getType() == LexemeType.Number) {
+            temp = Integer.valueOf(current.getLex());
+            current = lexer.getLexeme();
+        }
+        if("(".equals(current.getLex())) {
+            current = lexer.getLexeme();
+            temp = parseExpression();
+            if(!")".equals(current.getLex())){
+                throw new Exception("Error calculate");
+            }
+            current = lexer.getLexeme();
         }
         return temp;
     }
