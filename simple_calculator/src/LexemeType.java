@@ -1,1 +1,0 @@
-enum LexemeType {Number, Operation, UnoMinus, Bracket, EOF, Unknown}
