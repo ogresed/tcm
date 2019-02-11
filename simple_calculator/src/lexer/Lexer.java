@@ -3,109 +3,84 @@ package lexer;
 import java.io.IOException;
 import java.io.Reader;
 
+import static lexer.LexemeType.*;
+
 public class Lexer {
-    private static final char END_OF_FILE = '#';
+    private static final int END_OF_FILE = -1;
     private int current;
     private StringBuffer buffer;
     private Reader reader;
 
-    public Lexer(Reader reader) {
+    public Lexer(Reader reader) throws IOException {
         this.reader = reader;
         buffer = new StringBuffer();
-        try {
-            current = reader.read();
-        } catch (IOException e) {
-            System.out.println("Impossible read character");
-        }
+        current = reader.read();
     }
 
     public Lexeme getLexeme() throws Exception {
         Lexeme lexeme = new Lexeme();
         boolean b = true;
         while(b) {
-            switch (current) {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9': {
-                    buffer.append((char)current);
-                    current = reader.read();
-                    break;
+            if(Character.isDigit(current)) {
+                buffer.append((char)current);
+                current = reader.read();
+            }
+            else {
+                if(buffer.length() != 0) {
+                    lexeme.setType(LexemeType.Number);
+                    lexeme.setLex(buffer.toString());
+                    buffer.delete(0, buffer.length());
+                    b = false;
                 }
-                case '^':
-                case '+':
-                case '-':
-                case '/':
-                case '*': {
-                    if(buffer.length() != 0) {
-                        lexeme.setType(LexemeType.Number);
-                        lexeme.setLex(buffer.toString());
-                        buffer.delete(0, buffer.length());
-                        b = false;
-                        break;
-                    }
+                else if (isOperationOrBracket(current) || -1 == current) {
                     lexeme.setLex(String.valueOf((char)current));
-                    lexeme.setType(LexemeType.Operation);
-                    current = reader.read();
                     b = false;
-                    break;
-                }
-                case '(':
-                case ')': {
-                    if(buffer.length() != 0) {
-                        lexeme.setType(LexemeType.Number);
-                        lexeme.setLex(buffer.toString());
-                        buffer.delete(0, buffer.length());
-                        b = false;
-                        break;
-                    }
-                    lexeme.setLex(String.valueOf((char)current));
-                    lexeme.setType(LexemeType.Bracket);
-                    current = reader.read();
-                    b = false;
-                    break;
-                }
-                case -1: {
-                    if(buffer.length() != 0) {
-                        lexeme.setType(LexemeType.Number);
-                        lexeme.setLex(buffer.toString());
-                        buffer.delete(0, buffer.length());
-                        b = false;
-                        break;
-                    }
-                    lexeme.setLex(String.valueOf(END_OF_FILE));
-                    lexeme.setType(LexemeType.EOF);
-                    b = false;
-                    break;
-                }
-                case ' ': {
-                    if(buffer.length() != 0) {
-                        lexeme.setType(LexemeType.Number);
-                        lexeme.setLex(buffer.toString());
-                        buffer.delete(0, buffer.length());
-                        b = false;
+                    switch (current) {
+                        case '^': {
+                            lexeme.setType(Degree);
+                            break;
+                        }
+                        case '+': {
+                            lexeme.setType(Plus);
+                            break;
+                        }
+                        case '-': {
+                            lexeme.setType(Minus);
+                            break;
+                        }
+                        case '/': {
+                            lexeme.setType(Divide);
+                            break;
+                        }
+                        case '*': {
+                            lexeme.setType(Multiply);
+                            break;
+                        }
+                        case '(': {
+                            lexeme.setType(LeftBracket);
+                            break;
+                        }
+                        case ')': {
+                            lexeme.setType(RightBracket);
+                            break;
+                        }
+                        case END_OF_FILE: {
+                            lexeme.setType(EOF);
+                            break;
+                        }
                     }
                     current = reader.read();
-                    break;
                 }
-                default: {
-                    if(buffer.length() != 0) {
-                        lexeme.setType(LexemeType.Number);
-                        lexeme.setLex(buffer.toString());
-                        buffer.delete(0, buffer.length());
-                        b = false;
-                        break;
-                    }
-                    throw new Exception("Wrong character");
-                }
+                else if(current == ' ')
+                    current = reader.read();
+                else throw new Exception("Wrong character");
             }
         }
         return lexeme;
+    }
+
+    private boolean isOperationOrBracket(int current) {
+        return current == '+' || current == '-' || current == '*' || current == '/' ||
+                current == '^' || current == '(' || current == ')';
     }
 }

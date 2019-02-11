@@ -1,11 +1,13 @@
 package lexer;
 
+import static lexer.LexemeType.EOF;
+
 public class Lexeme {
     LexemeType type;
     String lex;
 
     Lexeme() {
-
+        type = EOF;
     }
 
     Lexeme(int character, LexemeType type) {

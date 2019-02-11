@@ -9,8 +9,8 @@ public class Parser {
     private Lexeme current;
 
     public Parser(Reader reader) {
-        lexer = new Lexer(reader);
         try {
+            lexer = new Lexer(reader);
             current = lexer.getLexeme();
         } catch (Exception e) {
             System.out.println(e.getMessage());
