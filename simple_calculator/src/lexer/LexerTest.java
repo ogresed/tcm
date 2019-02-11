@@ -13,7 +13,9 @@ public class LexerTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    @org.junit.Test
+
+
+    @Test
     public void getLexeme() throws Exception {
         Lexer lexer;
         Lexeme  lexeme;
@@ -28,6 +30,7 @@ public class LexerTest {
         lexer.getLexeme();
         //3
         StringReader reader2 = new StringReader("    5");
+        lexer = new Lexer(reader2);
         lexeme = lexer.getLexeme();
         assertEquals(LexemeType.Number, lexeme.type);
         //4
@@ -37,6 +40,7 @@ public class LexerTest {
         assertEquals(LexemeType.EOF, lexeme.type);
         //5
         StringReader reader3 = new StringReader("() + - ^/*");
+        lexer = new Lexer(reader3);
         lexeme = lexer.getLexeme();
         assertEquals("(", lexeme.lex);
         lexeme = lexer.getLexeme();

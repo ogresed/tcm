@@ -10,16 +10,6 @@ public class Lexeme {
         type = EOF;
     }
 
-    Lexeme(int character, LexemeType type) {
-        lex = String.valueOf((char)character);
-        this.type = type;
-    }
-
-    Lexeme(String lex, LexemeType type) {
-        this.lex = lex;
-        this.type = type;
-    }
-
     public LexemeType getType() {
         return type;
     }
@@ -28,11 +18,11 @@ public class Lexeme {
         return lex;
     }
 
-    public void setType(LexemeType type) {
+    void setType(LexemeType type) {
         this.type = type;
     }
 
-    public void setLex(String lex) {
+    void setLex(String lex) {
         this.lex = lex;
     }
 }
